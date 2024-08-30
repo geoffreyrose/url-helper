@@ -1,0 +1,26 @@
+{
+    "name": "geoffreyrose/url-helper",
+    "description": "A URL helper to parse out different parts of a URL",
+    "keywords": ["URL Helper", "URL", "PHP"],
+    "license": "MIT",
+    "require": {
+        "php": "^7.4 || ^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "UrlHelper\\": "src/UrlHelper"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0|^10.0|^11.0",
+        "php-coveralls/php-coveralls": "^2.5"
+    },
+    "config": {
+        "discard-changes": true
+    }
+}
