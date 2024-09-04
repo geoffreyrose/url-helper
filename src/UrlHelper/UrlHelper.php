@@ -6,33 +6,50 @@ class UrlHelper
 {
     public function isValidDomainName(string $domain): bool
     {
-        return preg_match("/([a-z\d-]{1,63}\.[a-z]{1,63}(\.[a-z]{2})?)$/i", $domain)
-            && preg_match('/.{1,255}/i', $domain);
+        // domains must be less than or equal to 253 characters in total
+        // each subdomain (or subdomain.subdomain, etc) must each be less than or equal to 63 characters
+        // country codes must be 2 characters
+        // this technically allows for invalid domain names like 'example.com.usa', assuming 'usa' is the country code
+        // but that is technically a valid domain name if the tld is 'usa' and the domain is 'com.usa' with a subdomain of 'example'
+        return preg_match("/^(?:[a-z\d-]{1,63}\.)*[a-z\d-]{1,63}\.[a-z]{2,63}$/i", $domain)
+            && strlen($domain) <= 253;
     }
 
     public function getHostname(string $url): ?string
     {
-        $d = $url;
-        if (!str_starts_with($d, 'https://') && !str_starts_with($d, 'http://')) {
-            $d = 'https://' . $d;
+        $privateUrl = $url;
+        $scheme = $this->getScheme($url);
+        if(!$scheme) {
+            $privateUrl = 'https://' . $privateUrl;
         }
 
-        $host = parse_url($d)['host'] ?? null;
+        $host = parse_url($privateUrl)['host'] ?? null;
         if ($host && $this->isValidDomainName($host)) {
-            return str_replace('www.', '', parse_url($d)['host']);
+            return $host;
         } else {
             return null;
         }
     }
 
-    public function getRootHostname(string $url): ?string
+    public function getScheme(string $url): ?string
     {
-        $d = $url;
-        if (!str_starts_with($d, 'https://') && !str_starts_with($d, 'http://')) {
-            $d = 'https://' . $d;
+        $scheme = null;
+        if(str_contains($url, '://')) {
+            $scheme = explode('://', $url)[0];
         }
 
-        $host = parse_url($d)['host'] ?? null;
+        return $scheme;
+    }
+
+    public function getRootHostname(string $url): ?string
+    {
+        $privateUrl = $url;
+        $scheme = $this->getScheme($url);
+        if(!$scheme) {
+            $privateUrl = 'https://' . $privateUrl;
+        }
+
+        $host = parse_url($privateUrl)['host'] ?? null;
         if ($host && $this->isValidDomainName($host)) {
             preg_match("/([a-z\d-]{1,63}\.[a-z]{1,63}(\.[a-z]{2})?)$/i", $host, $matches);
 
@@ -42,45 +59,54 @@ class UrlHelper
         return null;
     }
 
-    public function getUrlWithoutProtocol(string $url): string
+    public function getUrlWithoutScheme(string $url, bool $trimTrailingSlash=false): string
     {
-        $d = $url;
-        if (!str_starts_with($d, 'https://') && !str_starts_with($d, 'http://')) {
-            $d = 'https://' . $d;
+        $privateUrl = $url;
+        $scheme = $this->getScheme($url);
+        if(!$scheme) {
+            $privateUrl = 'https://' . $privateUrl;
         }
 
-        $url = parse_url($d)['host'];
-        if (isset(parse_url($d)['path'])) {
-            $url .= parse_url($d)['path'];
+        $urlWithoutScheme = parse_url($privateUrl)['host'];
+        if (isset(parse_url($privateUrl)['path'])) {
+            $urlWithoutScheme .= parse_url($privateUrl)['path'];
+
+            if ($trimTrailingSlash) {
+                $urlWithoutScheme = rtrim($urlWithoutScheme, '/');
+            }
         }
 
-        if (isset(parse_url($d)['query'])) {
-            $url .= '?' . parse_url($d)['query'];
+        if (isset(parse_url($privateUrl)['query'])) {
+            $urlWithoutScheme .= '?' . parse_url($privateUrl)['query'];
         }
 
-        return rtrim($url, '/');
+        return $urlWithoutScheme;
     }
 
     public function getValidURL(string $url): string|null
     {
-        $host = $this->getHostname($url);
-        if (!$host) {
+        $scheme = $this->getScheme($url);
+        if(!$scheme) {
             return null;
         }
 
-        $slug = str_replace('http://', '', $url);
-        $slug = str_replace('https://', '', $slug);
-        $slug = str_replace($host, '', $slug);
+        $host = $this->getHostname($url);
+        if(!$host) {
+            return null;
+        }
 
-        return 'https://' . $host . $slug;
+        $slug = $this->stringReplaceFirst($scheme . '://', '', $url);
+        $slug = $this->stringReplaceFirst($host, '', $slug);
+
+        return $scheme . '://' . $host . $slug;
     }
 
     public function convertAndroidAppToHttps(string $url): string
     {
         $new_url = '';
-        if (isset($url) && str_starts_with($url, 'android-app://')) {
+        if (str_starts_with($url, 'android-app://')) {
             $url = $this->stringReplaceFirst('android-app://', '', $url);
-            if ($this->strStartsWithInArray($url, ['org.', 'com.', 'net.', 'io.'])) {
+            if ($this->stringStartsWithInArray($url, ['org.', 'com.', 'net.', 'io.'])) {
                 $parts = array_reverse(explode('.', $url));
                 foreach ($parts as $part) {
                     $part = $this->stringReplaceFirst('/', '', $part);
@@ -99,45 +125,31 @@ class UrlHelper
 
     public function getPathname(string $url): string
     {
-        if (str_contains($url, '/#!/')) {
-            $url = str_replace('/#!/', '/', $url);
-        } elseif (str_contains($url, '/#/')) {
-            $url = str_replace('/#/', '/', $url);
+        $privateUrl = $url;
+        if (str_contains($privateUrl, '/#!/')) {
+            $privateUrl = str_replace('/#!/', '/', $privateUrl);
+        } elseif (str_contains($privateUrl, '/#/')) {
+            $privateUrl = str_replace('/#/', '/', $privateUrl);
         }
 
-        $pathname = parse_url($url)['path'] ?? '';
-        $fragment = parse_url($url)['fragment'] ?? '';
+        $pathname = parse_url($privateUrl)['path'] ?? '';
+        $fragment = parse_url($privateUrl)['fragment'] ?? '';
 
         if ($fragment) {
-            if (str_contains($url, '#/')) {
+            if (str_contains($privateUrl, '#/')) {
                 $pathname = $pathname . '#' . $fragment;
             } else {
                 $pathname = str_replace('#' . $fragment, '', $pathname);
             }
         }
 
-        if (str_contains($pathname, 'http://')) {
-            $pathname = explode('http://', $pathname)[0];
-        }
-
-        if (str_contains($pathname, 'https://')) {
-            $pathname = explode('https://', $pathname)[0];
+        $scheme = $this->getScheme($url);
+        if ($scheme && str_contains($pathname, $scheme)) {
+            $pathname = explode($scheme, $pathname)[0];
         }
 
         if ($pathname) {
             $pathname = rtrim($pathname, '/');
-        }
-
-        if ($pathname) {
-            if (str_starts_with($pathname, '/#!/')) {
-                $pathname = str_replace('/#!/', '/', $pathname);
-            }
-        }
-
-        if ($pathname) {
-            if (str_starts_with($pathname, '/#/')) {
-                $pathname = str_replace('/#/', '/', $pathname);
-            }
         }
 
         if ($pathname) {
@@ -154,35 +166,35 @@ class UrlHelper
 
     public function getParameters(string $url): array|null
     {
-        try {
-            $parse = parse_url($url);
-            $url = str_replace($parse['scheme'] . '://' . $parse['host'], '', $url);
-            if (str_starts_with($url, '/#!/')) {
-                $url = str_replace('/#!/', '/', $url);
-            }
-
-            if (str_starts_with($url, '/#/')) {
-                $url = str_replace('/#/', '/', $url);
-            }
-
-            if (str_contains($url, '#/')) {
-                $url = str_replace('#/', '', $url);
-            }
-
-            $query = parse_url($url)['query'] ?? null;
-            $parameters = null;
-            if ($query) {
-                parse_str($query, $request_query);
-                $parameters = $request_query;
-            }
-
-            // at some point deal with url paths  like /text:123:abc
-            // add in /text:123:abc ['text' => ['123', 'abc']]
-            // and /text:123 to $parameters array as ['text' => 123]
-
-        } catch (\Throwable $th) {
-            $parameters = null;
+        $scheme = $this->getScheme($url);
+        if(!$scheme) {
+            $url = 'https://' . $url;
         }
+        $url = $this->getValidURL($url);
+        $parse = parse_url($url);
+        $url = str_replace( $parse['scheme'] . '://' . $parse['host'], '', $url);
+        if (str_starts_with($url, '/#!/')) {
+            $url = str_replace('/#!/', '/', $url);
+        }
+
+        if (str_starts_with($url, '/#/')) {
+            $url = str_replace('/#/', '/', $url);
+        }
+
+        if (str_contains($url, '#/')) {
+            $url = str_replace('#/', '', $url);
+        }
+
+        $query = parse_url($url)['query'] ?? null;
+        $parameters = null;
+        if ($query) {
+            parse_str($query, $request_query);
+            $parameters = $request_query;
+        }
+
+        // at some point deal with url paths  like /text:123:abc
+        // add in /text:123:abc ['text' => ['123', 'abc']]
+        // and /text:123 to $parameters array as ['text' => 123]
 
         return $parameters;
     }
@@ -196,7 +208,7 @@ class UrlHelper
         return $subject;
     }
 
-    static private function strStartsWithInArray(string $string, array $startStrings): bool
+    static private function stringStartsWithInArray(string $string, array $startStrings): bool
     {
         foreach ($startStrings as $startString) {
             if (str_starts_with($string, $startString)) {

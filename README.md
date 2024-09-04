@@ -1,5 +1,5 @@
-# url-helper
-A simple helper to parse out different parts of a URL
+# PHP URL Helper
+An easy-to-use PHP helper to parse out different parts of a URL
 
 Run Tests
 

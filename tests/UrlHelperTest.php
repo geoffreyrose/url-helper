@@ -17,6 +17,13 @@ class UrlHelperTest extends TestCase
         $this->assertTrue($helper->isValidDomainName('test.example.com'));
         $this->assertTrue($helper->isValidDomainName('example.com.uk'));
         $this->assertFalse($helper->isValidDomainName('Frodo Baggins'));
+
+        // test different parts being too long
+        $this->assertFalse($helper->isValidDomainName('abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz.com'));
+        $this->assertFalse($helper->isValidDomainName('abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz.example.com'));
+        $this->assertFalse($helper->isValidDomainName('example.com.abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'));
+        $this->assertFalse($helper->isValidDomainName('abcdefghijklmnopqrstuvwxyz.abcdefghijklmnopqrstuvwxyz.abcdefghijklmnopqrstuvwxyz.abcdefghijklmnopqrstuvwxyz.abcdefghijklmnopqrstuvwxyz.abcdefghijklmnopqrstuvwxyz.abcdefghijklmnopqrstuvwxyz.abcdefghijklmnopqrstuvwxyz.abcdefghijklmnopqrstuvwxyz.abcdefghijklmnopqrstuvwxyz.com'));
+        $this->assertFalse($helper->isValidDomainName('example.com.a'));
     }
 
     /**
@@ -27,7 +34,7 @@ class UrlHelperTest extends TestCase
         $helper = new UrlHelper();
         $this->assertEquals('example.com', $helper->getHostname('https://example.com'));
         $this->assertEquals('example.com', $helper->getHostname('https://example.com/'));
-        $this->assertEquals('example.com', $helper->getHostname('https://www.example.com'));
+        $this->assertEquals('www.example.com', $helper->getHostname('https://www.example.com'));
         $this->assertEquals('app.example.com', $helper->getHostname('https://app.example.com/'));
         $this->assertEquals('app.example.com', $helper->getHostname('https://app.example.com'));
         $this->assertEquals('123.app.example.com', $helper->getHostname('https://123.app.example.com/'));
@@ -91,29 +98,33 @@ class UrlHelperTest extends TestCase
     }
 
     /**
-     * test getUrlWithoutProtocol
+     * test getUrlWithoutScheme
      */
-    public function testGetUrlWithoutProtocol()
+    public function testGetUrlWithoutScheme()
     {
         $helper = new UrlHelper();
-        $this->assertEquals('example.com', $helper->getUrlWithoutProtocol('https://example.com'));
-        $this->assertEquals('example.com', $helper->getUrlWithoutProtocol('https://example.com/'));
-        $this->assertEquals('example.com', $helper->getUrlWithoutProtocol('https://example.com'));
-        $this->assertEquals('app.example.com', $helper->getUrlWithoutProtocol('https://app.example.com/'));
-        $this->assertEquals('example.com/test', $helper->getUrlWithoutProtocol('https://example.com/test'));
-        $this->assertEquals('example.com/test', $helper->getUrlWithoutProtocol('https://example.com/test/'));
+        $this->assertEquals('example.com', $helper->getUrlWithoutScheme('https://example.com'));
+        $this->assertEquals('example.com/', $helper->getUrlWithoutScheme('https://example.com/'));
+        $this->assertEquals('example.com', $helper->getUrlWithoutScheme('https://example.com/', true));
+        $this->assertEquals('example.com', $helper->getUrlWithoutScheme('https://example.com'));
+        $this->assertEquals('app.example.com/', $helper->getUrlWithoutScheme('https://app.example.com/'));
+        $this->assertEquals('example.com/test', $helper->getUrlWithoutScheme('https://example.com/test'));
+        $this->assertEquals('example.com/test/', $helper->getUrlWithoutScheme('https://example.com/test/'));
+        $this->assertEquals('example.com/test', $helper->getUrlWithoutScheme('https://example.com/test/', true));
 
-        $this->assertEquals('example.com?test=12345', $helper->getUrlWithoutProtocol('https://example.com?test=12345'));
-        $this->assertEquals('app.example.com/?test=12345', $helper->getUrlWithoutProtocol('https://app.example.com/?test=12345'));
-        $this->assertEquals('example.com/test?test=12345', $helper->getUrlWithoutProtocol('https://example.com/test?test=12345'));
-        $this->assertEquals('example.com/test/?test=12345', $helper->getUrlWithoutProtocol('https://example.com/test/?test=12345'));
+        $this->assertEquals('example.com?test=12345', $helper->getUrlWithoutScheme('https://example.com?test=12345'));
+        $this->assertEquals('example.com?test=12345', $helper->getUrlWithoutScheme('https://example.com/?test=12345', true));
+        $this->assertEquals('app.example.com/?test=12345', $helper->getUrlWithoutScheme('https://app.example.com/?test=12345'));
+        $this->assertEquals('example.com/test?test=12345', $helper->getUrlWithoutScheme('https://example.com/test?test=12345'));
+        $this->assertEquals('example.com/test/?test=12345', $helper->getUrlWithoutScheme('https://example.com/test/?test=12345'));
+        $this->assertEquals('example.com/test?test=12345', $helper->getUrlWithoutScheme('https://example.com/test/?test=12345', true));
 
-        $this->assertEquals('example.com/filter:test:12345', $helper->getUrlWithoutProtocol('https://example.com/filter:test:12345'));
-        $this->assertEquals('example.com/filter:test:12345/filter:abc:xyz', $helper->getUrlWithoutProtocol('https://example.com/filter:test:12345/filter:abc:xyz'));
-        $this->assertEquals('example.com/test/filter:test:12345', $helper->getUrlWithoutProtocol('https://example.com/test/filter:test:12345'));
-        $this->assertEquals('example.com/test/filter:test:12345/filter:abc:xyz', $helper->getUrlWithoutProtocol('https://example.com/test/filter:test:12345/filter:abc:xyz'));
+        $this->assertEquals('example.com/filter:test:12345', $helper->getUrlWithoutScheme('https://example.com/filter:test:12345'));
+        $this->assertEquals('example.com/filter:test:12345/filter:abc:xyz', $helper->getUrlWithoutScheme('https://example.com/filter:test:12345/filter:abc:xyz'));
+        $this->assertEquals('example.com/test/filter:test:12345', $helper->getUrlWithoutScheme('https://example.com/test/filter:test:12345'));
+        $this->assertEquals('example.com/test/filter:test:12345/filter:abc:xyz', $helper->getUrlWithoutScheme('https://example.com/test/filter:test:12345/filter:abc:xyz'));
 
-        $this->assertEquals('example.com/test/filter:test:12345/filter:abc:xyz', $helper->getUrlWithoutProtocol('example.com/test/filter:test:12345/filter:abc:xyz'));
+        $this->assertEquals('example.com/test/filter:test:12345/filter:abc:xyz', $helper->getUrlWithoutScheme('example.com/test/filter:test:12345/filter:abc:xyz'));
     }
 
     /**
@@ -122,6 +133,8 @@ class UrlHelperTest extends TestCase
     public function testGetValidURL()
     {
         $helper = new UrlHelper();
+        $this->assertEquals(null, $helper->getValidURL('example.com'));
+        $this->assertEquals(null, $helper->getValidURL('https://example'));
         $this->assertEquals('https://example.com', $helper->getValidURL('https://example.com'));
         $this->assertEquals('https://example.com/', $helper->getValidURL('https://example.com/'));
         $this->assertEquals('https://example.com/test', $helper->getValidURL('https://example.com/test'));
@@ -224,6 +237,7 @@ class UrlHelperTest extends TestCase
     public function testGetParameters()
     {
         $helper = new UrlHelper();
+        $this->assertEquals(null, $helper->getParameters('example.com/test/#abc'));
         $this->assertEquals(null, $helper->getParameters('https://example.com/test/#abc'));
         $this->assertEquals(['test' => 123], $helper->getParameters('https://example.com/test?test=123'));
         $this->assertEquals(null, $helper->getParameters('https://example.com/test#abc'));
@@ -239,33 +253,5 @@ class UrlHelperTest extends TestCase
         $this->assertEquals(['test' => 123], $helper->getParameters('https://example.com/#!/test?test=123'));
         $this->assertEquals(['s' => 'https://www.google.com/'], $helper->getParameters('https://example.com/?s=https://www.google.com/'));
         $this->assertEquals(['s' => 'http://www.google.com/'], $helper->getParameters('https://example.com/?s=http://www.google.com/'));
-
-        // to figure out in the future
-        //        $this->assertEquals([
-        //            'filter' => [
-        //                'test' => 123,
-        //                'abc' => 'xyz',
-        //            ],
-        //        ], $helper->getParameters('https://example.com/filter:test:123/filter:abc:xyz'));
-        //
-        //        $this->assertEquals([
-        //            'filter' => [
-        //                'test' => 123,
-        //            ],
-        //        ], $helper->getParameters('https://example.com/filter:test:123/'));
-        //
-        //        $this->assertEquals([
-        //            'filter' => [
-        //                'test' => 123,
-        //                'abc' => 'xyz',
-        //            ],
-        //        ], $helper->getParameters('https://example.com/test/filter:test:123/filter:abc:xyz'));
-        //
-        //        $this->assertEquals([
-        //            'filter' => [
-        //                'test' => 123,
-        //            ],
-        //        ], $helper->getParameters('https://example.com/test/filter:test:123/'));
-
     }
 }
