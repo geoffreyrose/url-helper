@@ -83,7 +83,7 @@ class UrlHelper
         return $urlWithoutScheme;
     }
 
-    public function getValidURL(string $url): string|null
+    public function getValidURL(string $url): ?string
     {
         $scheme = $this->getScheme($url);
         if(!$scheme) {
@@ -164,7 +164,7 @@ class UrlHelper
         return $pathname;
     }
 
-    public function getParameters(string $url): array|null
+    public function getParameters(string $url): ?array
     {
         $scheme = $this->getScheme($url);
         if(!$scheme) {
