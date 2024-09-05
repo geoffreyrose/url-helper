@@ -85,6 +85,8 @@ getUrlWithoutScheme(string $url, bool $trimTrailingSlash=false): ?string
 $urlHelper = new UrlHelper();
 
 $urlHelper->getUrlWithoutScheme('https://example.com'); // example.com
+$urlHelper->getUrlWithoutScheme('https://example.com/', true); // example.com
+$urlHelper->getUrlWithoutScheme('https://example.com/test/?abc=123', true); // example.com/test?abc=123
 $urlHelper->getUrlWithoutScheme('https://www.example.com')); // www.example.com
 $urlHelper->getUrlWithoutScheme('Peregrin Took'); // null
 ```
