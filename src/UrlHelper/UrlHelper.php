@@ -129,13 +129,7 @@ class UrlHelper
         }
 
         if($new_url) {
-            $scheme = $this->getScheme($url);
-            if ($scheme) {
-                $new_url = str_replace($scheme . '://', '', $new_url);
-                $new_url = 'https://' . $new_url;
-            } else {
-                $new_url = 'https://' . $new_url;
-            }
+            $new_url = 'https://' . $new_url;
         }
 
         return $new_url;
