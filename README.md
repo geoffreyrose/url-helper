@@ -34,40 +34,106 @@ $urlHelper = new UrlHelper();
 
 ### Methods
 
+#### isValidDomainName()
 ```
-public function isValidDomainName(string $domain): bool
+isValidDomainName(string $domain): bool
+
+$urlHelper = new UrlHelper();
+
+$urlHelper->isValidDomainName('https://example.com'); // true
+$urlHelper->isValidDomainName('example.com'); // true
+$urlHelper->isValidDomainName('Frodo Baggins'); // false
 ```
 
+#### getHostname()
 ```
-public function getHostname(string $url): ?string
+getHostname(string $url): ?string
+
+$urlHelper = new UrlHelper();
+
+$urlHelper->getHostname('https://example.com'); // example.com
+$urlHelper->getHostname('https://www.example.com')); // www.example.com
+$urlHelper->getHostname('Bilbo Baggins'); // null
 ```
 
+#### getScheme()
 ```
-public function getScheme(string $url): ?string
+getScheme(string $url): ?string
+
+$urlHelper = new UrlHelper();
+
+$urlHelper->getScheme('https://example.com'); // https
+$urlHelper->getScheme('example.com'); // null
+$urlHelper->getScheme('ftp://example.com'); // ftp
+$urlHelper->getScheme('Dark Lord Sauron'); // null
 ```
 
+#### getRootHostname()
 ```
-public function getRootHostname(string $url): ?string
+getRootHostname(string $url): ?string
+
+$urlHelper = new UrlHelper();
+
+$urlHelper->getRootHostname('https://example.com'); // example.com
+$urlHelper->getRootHostname('https://www.example.com')); // example.com
+$urlHelper->getRootHostname('Samwise Gamge'); // null
 ```
 
+#### getUrlWithoutScheme()
 ```
-public function getUrlWithoutScheme(string $url, bool $trimTrailingSlash=false): string
+getUrlWithoutScheme(string $url, bool $trimTrailingSlash=false): ?string
+
+$urlHelper = new UrlHelper();
+
+$urlHelper->getUrlWithoutScheme('https://example.com'); // example.com
+$urlHelper->getUrlWithoutScheme('https://www.example.com')); // www.example.com
+$urlHelper->getUrlWithoutScheme('Peregrin Took'); // null
 ```
 
+#### getValidURL()
 ```
-public function getValidURL(string $url): ?string
+getValidURL(string $url): ?string
+
+$urlHelper = new UrlHelper();
+
+$urlHelper->getValidURL('https://example.com'); // https://example.com
+$urlHelper->getValidURL('https://www.example.com'); // https://www.example.com
+$urlHelper->getValidURL('https://example.com/test'); // https://example.com/test
+$urlHelper->getValidURL('example.com'); // null
+$urlHelper->getValidURL('Merry Brandybuck')); // null
 ```
 
+#### convertAndroidAppToHttps()
 ```
-public function convertAndroidAppToHttps(string $url): string
+convertAndroidAppToHttps(string $url): ?string
+
+$urlHelper = new UrlHelper();
+
+$urlHelper->convertAndroidAppToHttps('android-app://com.example'); // https://example.com
+$urlHelper->convertAndroidAppToHttps('android-app://example.com'); // https://example.com
+$urlHelper->convertAndroidAppToHttps('Dark Lord Sauron'); // null
 ```
 
+#### getPathname()
 ```
-public function getPathname(string $url): string
+getPathname(string $url): ?string
+
+$urlHelper = new UrlHelper();
+
+$urlHelper->getPathname('https://example.com/path/to/somewhere'); // /path/to/somewhere
+$urlHelper->getPathname('https://example.com'); // /
+$urlHelper->getPathname('https://example.com/test/abc?test=12345')); // /test/abc
 ```
 
+#### getParameters()
 ```
-public function getParameters(string $url): ?array
+getParameters(string $url): ?array
+
+$urlHelper = new UrlHelper();
+ 
+$urlHelper->getParameters('https://example.com/path/to/somewhere?test=12345&test2=abc'); // ['test' => '12345', 'test2' => 'abc']
+$urlHelper->getParameters('https://example.com'); // null
+$urlHelper->getPathname('Dark Lord Sauron'); // null
 ```
 
 

@@ -13,6 +13,7 @@ class UrlHelperTest extends TestCase
     public function testIsValidDomainName()
     {
         $helper = new UrlHelper();
+        $this->assertTrue($helper->isValidDomainName('https://example.com'));
         $this->assertTrue($helper->isValidDomainName('example.com'));
         $this->assertTrue($helper->isValidDomainName('test.example.com'));
         $this->assertTrue($helper->isValidDomainName('example.com.uk'));
@@ -107,6 +108,7 @@ class UrlHelperTest extends TestCase
         $this->assertEquals('example.com/', $helper->getUrlWithoutScheme('https://example.com/'));
         $this->assertEquals('example.com', $helper->getUrlWithoutScheme('https://example.com/', true));
         $this->assertEquals('example.com', $helper->getUrlWithoutScheme('https://example.com'));
+        $this->assertEquals('www.example.com', $helper->getUrlWithoutScheme('https://www.example.com'));
         $this->assertEquals('app.example.com/', $helper->getUrlWithoutScheme('https://app.example.com/'));
         $this->assertEquals('example.com/test', $helper->getUrlWithoutScheme('https://example.com/test'));
         $this->assertEquals('example.com/test/', $helper->getUrlWithoutScheme('https://example.com/test/'));
@@ -125,6 +127,8 @@ class UrlHelperTest extends TestCase
         $this->assertEquals('example.com/test/filter:test:12345/filter:abc:xyz', $helper->getUrlWithoutScheme('https://example.com/test/filter:test:12345/filter:abc:xyz'));
 
         $this->assertEquals('example.com/test/filter:test:12345/filter:abc:xyz', $helper->getUrlWithoutScheme('example.com/test/filter:test:12345/filter:abc:xyz'));
+
+        $this->assertEquals(null, $helper->getUrlWithoutScheme('Dark Lord Sauron'));
     }
 
     /**
@@ -174,6 +178,8 @@ class UrlHelperTest extends TestCase
         $this->assertEquals('https://app.example.com', $helper->convertAndroidAppToHttps('android-app://app.example.com'));
         $this->assertEquals('https://example.com', $helper->convertAndroidAppToHttps('android-app://com.example'));
         $this->assertEquals('https://app.example.com', $helper->convertAndroidAppToHttps('android-app://com.example.app'));
+
+        $this->assertEquals(null, $helper->convertAndroidAppToHttps('Dark Lord Sauron'));
     }
 
     /**
@@ -184,6 +190,7 @@ class UrlHelperTest extends TestCase
         $helper = new UrlHelper();
         $this->assertEquals('/', $helper->getPathname('https://example.com//'));
         $this->assertEquals('/', $helper->getPathname('https://example.com/'));
+        $this->assertEquals('/', $helper->getPathname('https://example.com'));
         $this->assertEquals('/test', $helper->getPathname('https://example.com/test/#abc'));
         $this->assertEquals('/test', $helper->getPathname('https://example.com/test#abc'));
         $this->assertEquals('/test#/abc', $helper->getPathname('https://example.com/test#/abc'));
@@ -229,6 +236,8 @@ class UrlHelperTest extends TestCase
         $this->assertEquals('/test', $helper->getPathname('https://example.com/test/http://www.google.com/#/abc'));
 
         $this->assertEquals('/test', $helper->getPathname('https://example.com/#!/test/#!/#abc/filter:test:12345'));
+
+        $this->assertEquals(null, $helper->getPathname('Dark Lord Sauron'));
     }
 
     /**
@@ -253,5 +262,22 @@ class UrlHelperTest extends TestCase
         $this->assertEquals(['test' => 123], $helper->getParameters('https://example.com/#!/test?test=123'));
         $this->assertEquals(['s' => 'https://www.google.com/'], $helper->getParameters('https://example.com/?s=https://www.google.com/'));
         $this->assertEquals(['s' => 'http://www.google.com/'], $helper->getParameters('https://example.com/?s=http://www.google.com/'));
+
+        $this->assertEquals(null, $helper->getParameters('Dark Lord Sauron'));
+    }
+
+    /**
+     * test getScheme
+     */
+    public function testGetScheme()
+    {
+        $helper = new UrlHelper();
+
+        $this->assertEquals('https', $helper->getScheme('https://example.com'));
+        $this->assertEquals('https', $helper->getScheme('https://example.com/'));
+        $this->assertEquals('https', $helper->getScheme('https://example.com/test'));
+        $this->assertEquals('http', $helper->getScheme('http://example.com/test/'));
+        $this->assertEquals(null, $helper->getScheme('example.com'));
+        $this->assertEquals(null, $helper->getScheme('Dark Lord Sauron'));
     }
 }
