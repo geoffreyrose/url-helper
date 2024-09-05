@@ -13,7 +13,7 @@ class UrlHelperTest extends TestCase
     public function testIsValidDomainName()
     {
         $helper = new UrlHelper();
-        $this->assertTrue($helper->isValidDomainName('https://example.com'));
+        $this->assertFalse($helper->isValidDomainName('https://example.com'));
         $this->assertTrue($helper->isValidDomainName('example.com'));
         $this->assertTrue($helper->isValidDomainName('test.example.com'));
         $this->assertTrue($helper->isValidDomainName('example.com.uk'));

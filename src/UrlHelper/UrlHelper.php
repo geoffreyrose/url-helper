@@ -6,17 +6,13 @@ class UrlHelper
 {
     public function isValidDomainName(string $domain): bool
     {
-        $privateDomain = $domain;
-        if($this->getScheme($privateDomain)) {
-            $privateDomain = str_replace($this->getScheme($domain) . '://', '', $privateDomain);
-        }
         // domains must be less than or equal to 253 characters in total
         // each subdomain (or subdomain.subdomain, etc) must each be less than or equal to 63 characters
         // country codes must be 2 characters
         // this technically allows for invalid domain names like 'example.com.usa', assuming 'usa' is the country code
         // but that is technically a valid domain name if the tld is 'usa' and the domain is 'com.usa' with a subdomain of 'example'
-        return preg_match("/^(?:[a-z\d-]{1,63}\.)*[a-z\d-]{1,63}\.[a-z]{2,63}$/i", $privateDomain)
-            && strlen($privateDomain) <= 253;
+        return preg_match("/^(?:[a-z\d-]{1,63}\.)*[a-z\d-]{1,63}\.[a-z]{2,63}$/i", $domain)
+            && strlen($domain) <= 253;
     }
 
     public function getHostname(string $url): ?string

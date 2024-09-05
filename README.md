@@ -39,7 +39,7 @@ isValidDomainName(string $domain): bool
 
 $urlHelper = new UrlHelper();
 
-$urlHelper->isValidDomainName('https://example.com'); // true
+$urlHelper->isValidDomainName('https://example.com'); // false
 $urlHelper->isValidDomainName('example.com'); // true
 $urlHelper->isValidDomainName('Frodo Baggins'); // false
 ```
