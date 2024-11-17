@@ -6,8 +6,8 @@
 [![License](https://img.shields.io/github/license/geoffreyrose/url-helper?style=flat-square)](https://github.com/geoffreyrose/url-helper/blob/main/LICENSE)
 </div>
 
-# PHP URL Helper
-An easy-to-use PHP helper to parse out different parts of a URL
+# PHP URL Helper + Laravel Facade
+An easy-to-use PHP helper (and Laravel Facade) to parse out different parts of a URL
 
 
 ### Requirements
@@ -15,15 +15,14 @@ An easy-to-use PHP helper to parse out different parts of a URL
 
 ### Usage
 
+### Install
 ```
-$ composer require geoffreyrose/url-helper
+composer require geoffreyrose/url-helper
 ```
+
+### With Plain PHP
 
 ```php
-<?php
-
-require 'vendor/autoload.php';
-
 use UrlHelper\UrlHelper;
 
 ...
@@ -31,7 +30,18 @@ use UrlHelper\UrlHelper;
 $urlHelper = new UrlHelper();
 ```
 
+
+### With Laravel Facade
+Laravel uses Package Auto-Discovery, which doesn't require you to manually add the ServiceProvider and Facade.
+
+```php
+$rootHostname = URLHelper::getRootHostname('https://github.com/geoffreyrose/url-helper/')
+```
+
+
 ### Methods
+
+**Note all examples below use Plain PHP (use UrlHelper\UrlHelper) but can be swapped with Laravel Facade (URLHelper)**
 
 #### isValidDomainName()
 ```
@@ -141,9 +151,9 @@ $urlHelper->getPathname('Dark Lord Sauron'); // null
 ### Run Tests
 
 ```
-$ ./vendor/bin/phpunit
+./vendor/bin/phpunit
 
 // or with coverage 
 
-$ XDEBUG_MODE=coverage ./vendor/bin/phpunit
+XDEBUG_MODE=coverage ./vendor/bin/phpunit
 ```

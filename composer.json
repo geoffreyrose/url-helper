@@ -20,7 +20,15 @@
         "phpunit/phpunit": "^9.0|^10.0|^11.0",
         "php-coveralls/php-coveralls": "^2.5"
     },
-    "config": {
-        "discard-changes": true
+    "minimum-stability": "dev",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "UrlHelper\\ServiceProvider"
+            ],
+            "aliases": {
+                "URLHelper": "UrlHelper\\Facades\\URLHelper"
+            }
+        }
     }
 }
