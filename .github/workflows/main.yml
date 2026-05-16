@@ -1,4 +1,7 @@
 name: PHP CI
+permissions:
+  contents: read
+  pull-requests: write
 
 on:
   push:
@@ -36,7 +39,7 @@ jobs:
           coverage: xdebug
           tools: php-cs-fixer, phpunit:${{ matrix.phpunit-version }}
       - name: Composer Install
-        run: composer install --no-interaction --dev 
+        run: composer install --no-interaction --dev
       - name: Run Tests
         run: ./vendor/bin/phpunit
       - name: Codecov
