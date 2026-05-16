@@ -15,7 +15,7 @@
 >
     <coverage>
         <report>
-            <clover outputFile="./build/logs/clover.xml"/>
+            <clover outputFile="./clover.xml"/>
             <html outputDirectory="./reports/"/>
         </report>
     </coverage>
