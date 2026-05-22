@@ -11,7 +11,7 @@ An easy-to-use PHP helper (and Laravel Facade) to parse out different parts of a
 
 
 ### Requirements
-* PHP 8.0+
+* PHP 8.1+
 
 ### Usage
 
@@ -156,4 +156,18 @@ $urlHelper->getPathname('Dark Lord Sauron'); // null
 // or with coverage 
 
 XDEBUG_MODE=coverage ./vendor/bin/phpunit
+herd coverage ./vendor/bin/phpunit 
+```
+
+### Linting
+
+```bash
+./vendor/bin/pint
+
+```
+
+### Static Analysis
+
+```bash
+./vendor/bin/phpstan analyse src --memory-limit 2G
 ```

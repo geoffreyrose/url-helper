@@ -11,10 +11,10 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(\UrlHelper\UrlHelper::class, function ($app) {
-            return new \UrlHelper\UrlHelper();
+        $this->app->singleton(UrlHelper::class, function ($app) {
+            return new UrlHelper;
         });
 
-        $this->app->alias(\UrlHelper\UrlHelper::class, 'urlhelper');
+        $this->app->alias(UrlHelper::class, 'urlhelper');
     }
 }
