@@ -154,28 +154,28 @@ class UrlHelper
      */
     public function convertAndroidAppToHttps(string $url): ?string
     {
-        $new_url = null;
-        if (str_starts_with($url, 'android-app://')) {
-            $url = $this->stringReplaceFirst('android-app://', '', $url);
-            if ($this->stringStartsWithInArray($url, ['org.', 'com.', 'net.', 'io.'])) {
-                $parts = array_reverse(explode('.', $url));
-                foreach ($parts as $part) {
-                    $part = $this->stringReplaceFirst('/', '', $part);
-
-                    $new_url .= $part . '.';
-                }
-
-                $new_url = rtrim($new_url, '.');
-            } else {
-                $new_url = $this->stringReplaceFirst('/', '', $url);
-            }
+        if (!str_starts_with($url, 'android-app://')) {
+            return null;
         }
 
-        if ($new_url) {
-            $new_url = 'https://' . $new_url;
+        $url = $this->stringReplaceFirst('android-app://', '', $url);
+
+        [$authority, $path] = array_pad(explode('/', $url, 2), 2, '');
+
+        if ($authority === '') {
+            return null;
         }
 
-        return $new_url;
+        if ($this->stringStartsWithInArray($authority, ['org.', 'com.', 'net.', 'io.'])) {
+            $authority = implode('.', array_reverse(explode('.', $authority)));
+        }
+
+        $newUrl = 'https://' . $authority;
+        if ($path !== '') {
+            $newUrl .= '/' . $path;
+        }
+
+        return $newUrl;
     }
 
     /**
@@ -300,7 +300,7 @@ class UrlHelper
             return substr_replace($subject, $replace, $pos, strlen($search));
         }
 
-        return $subject;
+        return $subject; // @codeCoverageIgnore
     }
 
     /**
