@@ -10,9 +10,9 @@ class UrlHelperTest extends TestCase
     /**
      * test isValidDomainName
      */
-    public function testIsValidDomainName()
+    public function test_is_valid_domain_name()
     {
-        $helper = new UrlHelper();
+        $helper = new UrlHelper;
         $this->assertFalse($helper->isValidDomainName('https://example.com'));
         $this->assertTrue($helper->isValidDomainName('example.com'));
         $this->assertTrue($helper->isValidDomainName('test.example.com'));
@@ -30,9 +30,9 @@ class UrlHelperTest extends TestCase
     /**
      * test getHostname
      */
-    public function testGetHostname()
+    public function test_get_hostname()
     {
-        $helper = new UrlHelper();
+        $helper = new UrlHelper;
         $this->assertEquals('example.com', $helper->getHostname('https://example.com'));
         $this->assertEquals('example.com', $helper->getHostname('https://example.com/'));
         $this->assertEquals('www.example.com', $helper->getHostname('https://www.example.com'));
@@ -63,9 +63,9 @@ class UrlHelperTest extends TestCase
     /**
      * test getRootHostname
      */
-    public function testGetRootHostname()
+    public function test_get_root_hostname()
     {
-        $helper = new UrlHelper();
+        $helper = new UrlHelper;
         $this->assertEquals('example.com', $helper->getRootHostname('https://example.com'));
         $this->assertEquals('example.com', $helper->getRootHostname('https://example.com/'));
         $this->assertEquals('example.com', $helper->getRootHostname('https://example.com'));
@@ -101,9 +101,9 @@ class UrlHelperTest extends TestCase
     /**
      * test getUrlWithoutScheme
      */
-    public function testGetUrlWithoutScheme()
+    public function test_get_url_without_scheme()
     {
-        $helper = new UrlHelper();
+        $helper = new UrlHelper;
         $this->assertEquals('example.com', $helper->getUrlWithoutScheme('https://example.com'));
         $this->assertEquals('example.com/', $helper->getUrlWithoutScheme('https://example.com/'));
         $this->assertEquals('example.com', $helper->getUrlWithoutScheme('https://example.com/', true));
@@ -134,9 +134,9 @@ class UrlHelperTest extends TestCase
     /**
      * test getValidURL
      */
-    public function testGetValidURL()
+    public function test_get_valid_url()
     {
-        $helper = new UrlHelper();
+        $helper = new UrlHelper;
         $this->assertEquals(null, $helper->getValidURL('example.com'));
         $this->assertEquals(null, $helper->getValidURL('https://example'));
         $this->assertEquals('https://example.com', $helper->getValidURL('https://example.com'));
@@ -170,9 +170,9 @@ class UrlHelperTest extends TestCase
     /**
      * test convertAndroidAppToHttps
      */
-    public function testConvertAndroidAppToHttps()
+    public function test_convert_android_app_to_https()
     {
-        $helper = new UrlHelper();
+        $helper = new UrlHelper;
         $this->assertEquals('https://example.com', $helper->convertAndroidAppToHttps('android-app://example.com'));
         $this->assertEquals('https://example.com', $helper->convertAndroidAppToHttps('android-app://example.com/'));
         $this->assertEquals('https://app.example.com', $helper->convertAndroidAppToHttps('android-app://app.example.com'));
@@ -185,9 +185,9 @@ class UrlHelperTest extends TestCase
     /**
      * test getPathname
      */
-    public function testGetPathname()
+    public function test_get_pathname()
     {
-        $helper = new UrlHelper();
+        $helper = new UrlHelper;
         $this->assertEquals('/', $helper->getPathname('https://example.com//'));
         $this->assertEquals('/', $helper->getPathname('https://example.com/'));
         $this->assertEquals('/', $helper->getPathname('https://example.com'));
@@ -243,12 +243,13 @@ class UrlHelperTest extends TestCase
     /**
      * test getParameters
      */
-    public function testGetParameters()
+    public function test_get_parameters()
     {
-        $helper = new UrlHelper();
+        $helper = new UrlHelper;
         $this->assertEquals(null, $helper->getParameters('example.com/test/#abc'));
         $this->assertEquals(null, $helper->getParameters('https://example.com/test/#abc'));
         $this->assertEquals(['test' => 123], $helper->getParameters('https://example.com/test?test=123'));
+        $this->assertEquals([987 => 123], $helper->getParameters('https://example.com/test?987=123'));
         $this->assertEquals(null, $helper->getParameters('https://example.com/test#abc'));
         $this->assertEquals(['test' => 123], $helper->getParameters('https://example.com/test/?test=123'));
         $this->assertEquals(['test' => 123, 'abc' => 'xyz'], $helper->getParameters('https://example.com/test/?test=123&abc=xyz'));
@@ -269,9 +270,9 @@ class UrlHelperTest extends TestCase
     /**
      * test getScheme
      */
-    public function testGetScheme()
+    public function test_get_scheme()
     {
-        $helper = new UrlHelper();
+        $helper = new UrlHelper;
 
         $this->assertEquals('https', $helper->getScheme('https://example.com'));
         $this->assertEquals('https', $helper->getScheme('https://example.com/'));

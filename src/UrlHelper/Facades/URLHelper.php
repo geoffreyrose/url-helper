@@ -2,7 +2,9 @@
 
 namespace UrlHelper\Facades;
 
-class URLHelper extends \Illuminate\Support\Facades\Facade
+use Illuminate\Support\Facades\Facade;
+
+class URLHelper extends Facade
 {
     protected static function getFacadeAccessor()
     {
